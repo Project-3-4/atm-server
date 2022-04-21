@@ -1,5 +1,7 @@
 const express = require("express");
 const fs = require("fs");
+const query = require("./database");
+
 
 const app = express();
 const router = express.Router();
@@ -12,18 +14,22 @@ const PORT = 9000;
  */
 router.use((req, res, next) => {
 	console.log("[info]\t\tMiddleware ingeschakeld!");
+	query.table("rekening");
+	query.get();
+	let q = query.execute();
+	console.log(q);
+
 	next();
 });
 router.param("authKey", (req, res, next, id) => {
 	console.log("[info]\t\tRouter param aangeroepen");
 
 	if (req.params.authKey == 400) {
-		
+		next();		
 	} else {
 		console.log("[error]\t\tU heeft niet de juiste bevoegdheid om de API te gebruiken!");
 		res.redirect("/api/error/401");
 	}
-	next();
 });
 
 
