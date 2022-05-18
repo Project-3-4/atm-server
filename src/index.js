@@ -38,7 +38,8 @@ router.param("authKey", (req, res, next, id) => {
  *
  */
 router.get("/api/:authKey/balance/get", (req, res, next) => {
-	res.send('Hellow, World');
+	// res.send('Hellow, World');
+	res.json({balance:246})
 });
 router.post("/api/:authKey/balance/post", (req, res, next) => {
 	
