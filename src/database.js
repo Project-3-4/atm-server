@@ -1,10 +1,10 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
 
 const DATABASE_DOMAIN 	= "127.0.0.1";
 const DATABASE_SCHEMA 	= "bankserver";
-const DATABASE_USER 	= "root";
-const DATABASE_PASSWORD	= "henkdepotvis";
+const DATABASE_USER 	= "dev";
+const DATABASE_PASSWORD	= "dev";
 
 let queryStr = "";
 let whereStr = "";

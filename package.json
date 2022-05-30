@@ -1,0 +1,25 @@
+{
+  "name": "atm-server-ukip",
+  "version": "1.0.0",
+  "description": "Includes API",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Project-3-4/atm-server-ukip.git"
+  },
+  "author": "Nico van Ommen & Ruben Flinterman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Project-3-4/atm-server-ukip/issues"
+  },
+  "homepage": "https://github.com/Project-3-4/atm-server-ukip#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mysql2": "^2.3.3",
+    "nodemon": "^2.0.16"
+  }
+}
