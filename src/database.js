@@ -1,10 +1,10 @@
 const mysql = require("mysql2");
 
 
-const DATABASE_DOMAIN 	= "127.0.0.1";
-const DATABASE_SCHEMA 	= "bankserver";
-const DATABASE_USER 	= "dev";
-const DATABASE_PASSWORD	= "dev";
+const DATABASE_DOMAIN = "127.0.0.1";
+const DATABASE_SCHEMA = "bankserver";
+const DATABASE_USER = "dev";
+const DATABASE_PASSWORD = "dev";
 
 let queryStr = "";
 let whereStr = "";
@@ -14,22 +14,22 @@ let whereCount = 0;
 
 /**
  * =====================|
- *			|
+ *            |
  * Database connection  |
- *			|
+ *            |
  * =====================|
  */
 const connection = mysql.createConnection({
-	host: DATABASE_DOMAIN,
-	user: DATABASE_USER,
-	password: DATABASE_PASSWORD,
-	database: DATABASE_SCHEMA,
-	insecureAuth: false,
+    host: DATABASE_DOMAIN,
+    user: DATABASE_USER,
+    password: DATABASE_PASSWORD,
+    database: DATABASE_SCHEMA,
+    insecureAuth: false,
 });
 
 connection.connect(error => {
-	if (error) throw error;
-	console.log("[success]\tConnection with database successfull!");
+    if (error) throw error;
+    console.log("[success]\tConnection with database successfull!");
 });
 
 
@@ -41,6 +41,49 @@ connection.connect(error => {
  * ================|
  */
 
+/**
+ * @brief Functie voor het toevoegen van data aan de database
+ * @param params
+ */
+function insert(params) {
+    if (params.length == 0) {
+        console.log("[error]\t\tEr zijn geen waardes aan de database gegeven!");
+        return;
+    }
+
+    if (tableStr.length == 0) {
+        console.log("[error]\t\tEr is geen tabelnaam gezet!");
+        return;
+    }
+
+    queryStr = "INSERT INTO " + tableStr + " ( ";
+    let objectKeys = Object.keys(params);
+    let objectValues = Object.values(params);
+
+    if (objectKeys > 0 && objectValues > 0) {
+        for (let i = 0; i < objectKeys.length; i++) {
+            queryStr += objectKeys[i];
+
+            if (i != objectKeys.length - 1) {
+                queryStr += ", ";
+            }
+        }
+
+        queryStr += ") VALUES (";
+
+        for (let i = 0; i < objectValues.length; i++) {
+            queryStr += `"${objectValues[i]}"`;
+
+            if (i != objectValues.length - 1) {
+                queryStr += ", ";
+            }
+        }
+
+        queryStr += ");";
+    } else {
+        return;
+    }
+}
 
 /**
  * @brief Functie voor het ophalen van de data uit de database
@@ -48,73 +91,27 @@ connection.connect(error => {
  * @returns void
  */
 function get(params = {}) {
-	queryStr = "SELECT ";
+    queryStr = "SELECT ";
 
-	if (Object.values(params).length != 0) {
-		for (let i = 0; i < params.length; i++) {
-			queryStr += params[i];
+    if (Object.values(params).length != 0) {
+        for (let i = 0; i < params.length; i++) {
+            queryStr += params[i];
 
-			if (i != params.length-1) {
-				queryStr += ", ";
-			}
-		}
-	} else {
-		queryStr += "*";
-	}
+            if (i != params.length - 1) {
+                queryStr += ", ";
+            }
+        }
+    } else {
+        queryStr += "*";
+    }
 
-	if (tableStr.length == 0) {
-		console.log("[error]\t\tEr is geen tabel naam toegevoegd!");
-		return;
-	}
+    if (tableStr.length == 0) {
+        console.log("[error]\t\tEr is geen tabel naam toegevoegd!");
+        return;
+    }
 
-	queryStr += " FROM " + tableStr + "  " + whereStr + " ;";
+    queryStr += " FROM " + tableStr + "  " + whereStr + " ;";
 };
-
-
-/**
- * @brief Functie voor het toevoegen van data aan de database
- * @param params
- */
-function insert(params) {
-	if (params.length == 0) {
-		console.log("[error]\t\tEr zijn geen waardes aan de database gegeven!");
-		return;
-	}
-
-	if (tableStr.length == 0) {
-		console.log("[error]\t\tEr is geen tabelnaam gezet!");
-		return;
-	}
-
-	queryStr = "INSERT INTO " + tableStr + " ( ";
-	let objectKeys = Object.keys(params);
-	let objectValues = Object.values(params);
-
-	if (objectKeys > 0 && objectValues > 0) {
-		for (let i = 0; i < objectKeys.length; i++) {
-			queryStr += objectKeys[i];
-
-			if (i != objectKeys.length-1) {
-				queryStr += ", ";
-			}
-		}
-
-		queryStr += ") VALUES (";
-
-		for (let i = 0; i < objectValues.length; i++) {
-			queryStr += `"${objectValues[i]}"`;
-
-			if (i != objectValues.length-1) {
-				queryStr += ", ";
-			}
-		}
-
-		queryStr += ");";
-	} else {
-		return;
-	}
-}
-
 
 /**
  * @brief Functie voor het updaten van regels in de database
@@ -122,30 +119,30 @@ function insert(params) {
  * @param params
  */
 function update(params) {
-	if (params.length == 0) {
-		console.log("[error]\t\tEr zijn geen waardes aan de database gegeven!");
-		return;
-	}
+    if (params.length == 0) {
+        console.log("[error]\t\tEr zijn geen waardes aan de database gegeven!");
+        return;
+    }
 
-	if (tableStr.length == 0) {
-		console.log("[error]\t\tEr is geen tabelnaam gezet!");
-	}
+    if (tableStr.length == 0) {
+        console.log("[error]\t\tEr is geen tabelnaam gezet!");
+    }
 
-	queryStr = "UPDATE " + tableStr + " SET";
-	objectKeys = Object.keys(params);
-	objectValues = Object.values(params);
+    queryStr = "UPDATE " + tableStr + " SET ";
+    objectKeys = Object.keys(params);
+    objectValues = Object.values(params);
 
-	if (objectKeys.length > 0 && objectValues.length > 0) {
-		for (let i = 0; i < objectKeys.length; i++) {
-			queryStr += `${objectKeys[i]} = "${objectValues[i]}"`;
+    if (objectKeys.length > 0 && objectValues.length > 0) {
+        for (let i = 0; i < objectKeys.length; i++) {
+            queryStr += `${objectKeys[i]} = "${objectValues[i]}"`;
 
-			if (i != objectKeys.length-1) {
-				queryStr += ", ";
-			}
-		}
-	} else {
-		return;
-	}
+            if (i != objectKeys.length - 1) {
+                queryStr += ", ";
+            }
+        }
+    } else {
+        return;
+    }
 }
 
 
@@ -153,12 +150,12 @@ function update(params) {
  * @brief Functie voor het verwijderen van data uit de database
  */
 function remove() {
-	if (tableStr.length = 0) {
-		console.log("[error]\t\tEr is geen tabelnaam gezet!");
-		return;
-	}
+    if (tableStr.length = 0) {
+        console.log("[error]\t\tEr is geen tabelnaam gezet!");
+        return;
+    }
 
-	queryStr = "DELETE FROM " + tableStr + " " + whereStr;
+    queryStr = "DELETE FROM " + tableStr + " " + whereStr;
 }
 
 
@@ -167,7 +164,7 @@ function remove() {
  * @param table
  */
 function table(table) {
-	tableStr = table;
+    tableStr = table;
 }
 
 
@@ -176,15 +173,15 @@ function table(table) {
  *
  */
 function where(params) {
-	if (whereCount > 0) {
-		whereStr += " AND ";
-	} else {
-		whereStr = " WHERE"
-	}
+    if (whereCount > 0) {
+        whereStr += " AND ";
+    } else {
+        whereStr = " WHERE "
+    }
 
-	for (let i = 0; i < param.length; i++) {
-		whereStr += param[i] + " ";
-	}
+    for (let i = 0; i < params.length; i++) {
+        whereStr += params[i] + " ";
+    }
 }
 
 
@@ -193,13 +190,14 @@ function where(params) {
  *
  */
 function execute() {
-	return new Promise((resolve, reject) => {
-		connection.query(queryStr, (error, results, fields) => {
-			if (error) reject(error);
-			resolve(results);
-			dispose();
-		});
-	});
+    console.log(queryStr);
+    return new Promise((resolve, reject) => {
+        connection.query(queryStr, (error, results, fields) => {
+            if (error) reject(error);
+            resolve(results);
+            dispose();
+        });
+    });
 }
 
 
@@ -209,11 +207,11 @@ function execute() {
  * @returns void
  */
 function empty(variable) {
-	if (variable == null) {
-		return;
-	}
+    if (variable == null) {
+        return;
+    }
 
-	variable = null;
+    variable = null;
 }
 
 
@@ -222,10 +220,10 @@ function empty(variable) {
  *
  */
 function dispose() {
-	empty(queryStr);
-	empty(whereStr);
-	empty(tableStr);
-	whereCount = 0;
+    empty(queryStr);
+    empty(whereStr);
+    empty(tableStr);
+    whereCount = 0;
 }
 
 
@@ -233,11 +231,11 @@ function dispose() {
  * @brief  Export functions
  */
 module.exports = {
-	get,
-	insert,
-	update,
-	remove,
-	table,
-	where,
-	execute,
+    get,
+    insert,
+    update,
+    remove,
+    table,
+    where,
+    execute,
 };
