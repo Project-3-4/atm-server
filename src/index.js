@@ -1,14 +1,15 @@
+require('dotenv').config()
 const express = require("express");
 const {execute, get, table, where, update} = require("./database");
 
-const config = require("./config.json");
-const PORT = config.port;
-
 const app = express();
 const router = express.Router();
+const secret = process.env;
 
-let balanceColumn = "current";
-let authKey;
+const config = require("./config.json");
+const PORT = config.port;
+let balanceColumn = config.balanceColumn;
+let authKey = undefined;
 
 /**
  * @brief Promise voor het instellen van de router
@@ -16,12 +17,6 @@ let authKey;
  */
 router.use((req, res, next) => {
     console.log("[info]\t\tMiddleware ingeschakeld!");
-    table("rekening");
-    get();
-
-    let q = execute();
-    console.log(q);
-
     next();
 });
 
@@ -30,14 +25,13 @@ router.param("authKey", (req, res, next, id) => {
 
     authKey = req.params.authKey;
 
-    if (req.params.authKey === "1234") {
+    if (req.params.authKey === secret.ADMIN_AUTH_KEY) {
         next();
     } else {
         console.log("[error]\t\tU heeft niet de juiste bevoegdheid om de API te gebruiken!");
         res.redirect("/api/error/401");
     }
 });
-
 
 /**
  *@brief Promise voor het handelen van de home routing
@@ -50,10 +44,7 @@ router.get("/api/:authKey/balance/get", async (req, res, next) => {
     get([balanceColumn]);
     let q = await execute();
 
-    // console.log(q);
-
-    balanceAmount = q[0].current;
-    // balanceAmount = 123.45;
+    let balanceAmount = q[0]?.current;
 
     res.json({
         balance: balanceAmount,
@@ -62,60 +53,29 @@ router.get("/api/:authKey/balance/get", async (req, res, next) => {
     })
 });
 
-router.post("/api/:authKey/balance/post", async (req, res, next) => {
-    // When auth key is provided and balance is requested
-    table("rekening");
-    where([`IBAN`, '=', authKey]);
-    get([balanceColumn]);
-    let q = await execute();
-
-    // console.log(q);
-
-    balanceAmount = q[0].current;
-    // balanceAmount = 123.45;
-
-    res.json({
-        balance: balanceAmount,
-        request: 200,
-        message: "Success"
-    })
-});
-
-router.get("/api/:authKey/withdraw/get", async (req, res, next) => {
+router.post("/api/:authKey/withdraw/post", async (req, res, next) => {
     // When auth key is provided and user wants to withdraw money
     table("rekening");
     where([`IBAN`, '=', authKey]);
     get([balanceColumn]);
+
     let q = await execute();
 
-    withdrawAmount = 10; // Connect to ATM
-    oldBalanceAmount = q[0].current; // Connect to DB
+    let withdrawAmount = 10; // Connect to ATM!!
+    let oldBalanceAmount = q[0].current; // Connect to DB
 
     table("rekening")
     where([`IBAN`, '=', authKey]);
     update({
         'current': oldBalanceAmount - withdrawAmount
     });
+
     q = await execute();
 
     res.json({
         withdraw: withdrawAmount,
         oldBalance: oldBalanceAmount,
         newBalance: q,
-        request: 200,
-        message: "Success"
-    })
-});
-
-router.post("/api/:authKey/withdraw/post", (req, res, next) => {
-    // When auth key is provided and user wants to withdraw money
-    withdrawAmount = 10; // Connect to ATM
-    oldBalanceAmount = 123.45; // Connect to DB
-
-    res.json({
-        withdraw: withdrawAmount,
-        oldBalance: oldBalanceAmount,
-        newBalance: (oldBalanceAmount - withdrawAmount), // Make variable for DB
         request: 200,
         message: "Success"
     })
@@ -128,12 +88,19 @@ router.get("/api/error/401", (req, res, next) => {
     });
 });
 
+router.get('*', function(req, res){
+    res.status(418).json({
+        request: 418,
+        message: "I'm a teapot (so I couldn't find your page)"
+    })
+});
 
 /**
  * @brief Functie voor het runnen van de webserver
  *
  */
 app.use('/', router);
+
 app.listen(PORT, () => {
     console.log(`[info]\t\tServer is running on port: ${PORT}`);
     console.log(`[info]\t\thttp://localhost:${PORT}`)

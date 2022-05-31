@@ -1,10 +1,13 @@
+require('dotenv').config()
+
 const mysql = require("mysql2");
+const secret = process.env;
+const config = require("./config.json");
 
-
-const DATABASE_DOMAIN = "127.0.0.1";
-const DATABASE_SCHEMA = "bankserver";
-const DATABASE_USER = "niko";
-const DATABASE_PASSWORD = "henkdepotvis";
+const DATABASE_DOMAIN = secret.DATABASE_DOMAIN;
+const DATABASE_SCHEMA = secret.DATABASE_SCHEMA;
+const DATABASE_USER = secret.DATABASE_USER;
+const DATABASE_PASSWORD = secret.DATABASE_PASSWORD;
 
 let queryStr = "";
 let whereStr = "";
@@ -194,7 +197,7 @@ function where(params) {
  *
  */
 function execute() {
-    console.log(queryStr);
+    if (config.printQuery) console.log(queryStr);
     return new Promise((resolve, reject) => {
         connection.query(queryStr, (error, results, fields) => {
             if (error) reject(error);
