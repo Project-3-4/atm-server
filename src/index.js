@@ -30,7 +30,7 @@ router.param("authKey", (req, res, next, id) => {
 
     authKey = req.params.authKey;
 
-    if (req.params.authKey === "123") {
+    if (req.params.authKey === "1234") {
         next();
     } else {
         console.log("[error]\t\tU heeft niet de juiste bevoegdheid om de API te gebruiken!");
@@ -93,7 +93,9 @@ router.get("/api/:authKey/withdraw/get", async (req, res, next) => {
 
     table("rekening")
     where([`IBAN`, '=', authKey]);
-    update([`${balanceColumn} = (${oldBalanceAmount - withdrawAmount})`])
+    update({
+        'current': oldBalanceAmount - withdrawAmount
+    });
     q = await execute();
 
     res.json({

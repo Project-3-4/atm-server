@@ -3,8 +3,8 @@ const mysql = require("mysql2");
 
 const DATABASE_DOMAIN = "127.0.0.1";
 const DATABASE_SCHEMA = "bankserver";
-const DATABASE_USER = "dev";
-const DATABASE_PASSWORD = "dev";
+const DATABASE_USER = "niko";
+const DATABASE_PASSWORD = "henkdepotvis";
 
 let queryStr = "";
 let whereStr = "";
@@ -134,6 +134,8 @@ function update(params) {
 
     if (objectKeys.length > 0 && objectValues.length > 0) {
         for (let i = 0; i < objectKeys.length; i++) {
+            console.log("[info]\t\tUpdate keys: " + objectKeys[i]);
+
             queryStr += `${objectKeys[i]} = "${objectValues[i]}"`;
 
             if (i != objectKeys.length - 1) {
@@ -143,6 +145,8 @@ function update(params) {
     } else {
         return;
     }
+
+    console.log("[info]\t\tUpdate string: " + queryStr);
 }
 
 
