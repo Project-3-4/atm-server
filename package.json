@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Project-3-4/atm-server-ukip#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "mysql2": "^2.3.3",
