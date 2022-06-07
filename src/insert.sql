@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema bankserver_main
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema bankserver_main
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `bankserver_main` DEFAULT CHARACTER SET utf8 ;
+USE `bankserver_main` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`user_account`
+-- Table `bankserver_main`.`user_account`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user_account` (
+CREATE TABLE IF NOT EXISTS `bankserver_main`.`user_account` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `email` VARCHAR(45) NULL,
@@ -32,9 +32,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`billing_account`
+-- Table `bankserver_main`.`billing_account`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`billing_account` (
+CREATE TABLE IF NOT EXISTS `bankserver_main`.`billing_account` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `iban` VARCHAR(100) NOT NULL,
   `bank_code` VARCHAR(45) NOT NULL,
@@ -46,16 +46,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`billing_account` (
   INDEX `fk_billing_account_user_account_idx` (`user_account_id` ASC) VISIBLE,
   CONSTRAINT `fk_billing_account_user_account`
     FOREIGN KEY (`user_account_id`)
-    REFERENCES `mydb`.`user_account` (`id`)
+    REFERENCES `bankserver_main`.`user_account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`atm-money`
+-- Table `bankserver_main`.`atm-money`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`atm-money` (
+CREATE TABLE IF NOT EXISTS `bankserver_main`.`atm-money` (
   `idATM-Money` INT NOT NULL,
   `1` INT NULL,
   `2` INT NULL,
@@ -68,9 +68,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`transaction`
+-- Table `bankserver_main`.`transaction`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`transaction` (
+CREATE TABLE IF NOT EXISTS `bankserver_main`.`transaction` (
   `idtransaction` INT NOT NULL,
   `balance_post_transaction` INT NOT NULL,
   `amount` INT NULL,
@@ -79,16 +79,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`transaction` (
   INDEX `balance_idx` (`balance_post_transaction` ASC) VISIBLE,
   CONSTRAINT `balance`
     FOREIGN KEY (`balance_post_transaction`)
-    REFERENCES `mydb`.`billing_account` (`balance`)
+    REFERENCES `bankserver_main`.`billing_account` (`balance`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`transaction_has_atm-money`
+-- Table `bankserver_main`.`transaction_has_atm-money`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`transaction_has_atm-money` (
+CREATE TABLE IF NOT EXISTS `bankserver_main`.`transaction_has_atm-money` (
   `transaction_idtransaction` INT NOT NULL,
   `transaction_balance_post_transaction` INT NOT NULL,
   `atm-money_idATM-Money` INT NOT NULL,
@@ -97,12 +97,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`transaction_has_atm-money` (
   INDEX `fk_transaction_has_atm-money_transaction1_idx` (`transaction_idtransaction` ASC, `transaction_balance_post_transaction` ASC) VISIBLE,
   CONSTRAINT `fk_transaction_has_atm-money_transaction1`
     FOREIGN KEY (`transaction_idtransaction` , `transaction_balance_post_transaction`)
-    REFERENCES `mydb`.`transaction` (`idtransaction` , `balance_post_transaction`)
+    REFERENCES `bankserver_main`.`transaction` (`idtransaction` , `balance_post_transaction`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_transaction_has_atm-money_atm-money1`
     FOREIGN KEY (`atm-money_idATM-Money`)
-    REFERENCES `mydb`.`atm-money` (`idATM-Money`)
+    REFERENCES `bankserver_main`.`atm-money` (`idATM-Money`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
