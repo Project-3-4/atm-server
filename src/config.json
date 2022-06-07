@@ -1,5 +1,5 @@
 {
   "port": 9000,
-  "balanceColumn": "current",
-  "printQuery": false
+  "balanceColumn": "balance",
+  "printQuery": true
 }

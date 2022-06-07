@@ -13,6 +13,12 @@ let balanceColumn = config.balanceColumn;
 
 let authKey = undefined;
 let pinCode = 1111;
+
+/**
+ * Pages:
+ * http://localhost:9000/api/123/balance/get
+ */
+
 /**
  * @brief Promise to (setup and) check the midleware
  */
@@ -28,17 +34,17 @@ router.use((req, res, next) => {
 router.param("authKey", async (req, res, next, id) => {
     console.log("[info]\t\tRouter param aangeroepen");
 
-    // table("account");
-    // where(['rekeningID', '=', authKey]);
-    // get();
-    // let q = await execute();
-
-    // let dbUserPass = q[0]?.password; // Needs to be equal to PIN
-    // let dbRekeningId = q[0]?.rekeningID; // Needs to be equal to authKey
-
     authKey = req.params.authKey;
 
-    if (authKey === secret.ADMIN_AUTH_KEY || (authKey === dbRekeningId && pinCode === dbUserPass)) {
+    table("user_account");
+    where(['iban', '=', authKey]);
+    get();
+    let q = await execute();
+
+    let dbUserPass = q[0]?.pin; // Needs to be equal to PIN
+    let dbRekeningId = q[0]?.iban; // Needs to be equal to authKey
+
+    if (authKey === secret.ADMIN_AUTH_KEY || (dbRekeningId === authKey && dbUserPass === pinCode)) {
         next();
     } else {
         console.log("[error]\t\tU heeft niet de juiste bevoegdheid om de API te gebruiken!");
@@ -54,12 +60,12 @@ router.options('*', cors())
  */
 router.get("/api/:authKey/balance/get", async (req, res, next) => {
     // When auth key is provided and balance is requested
-    table("rekening");
-    where([`IBAN`, '=', authKey]);
+    table("billing_account");
+    where([`iban`, '=', authKey]);
     get([balanceColumn]);
     let q = await execute();
 
-    let balanceAmount = q[0]?.current;
+    let balanceAmount = q[0]?.balance;
 
     res.json([{
         balance: balanceAmount,
@@ -74,17 +80,17 @@ router.get("/api/:authKey/balance/get", async (req, res, next) => {
  */
 router.post("/api/:authKey/withdraw/post", async (req, res, next) => {
     // When auth key is provided and user wants to withdraw money
-    table("rekening");
-    where([`IBAN`, '=', authKey]);
+    table("billing_account");
+    where([`iban`, '=', authKey]);
     get([balanceColumn]);
 
     let q = await execute();
 
     let withdrawAmount = 10; // Connect to ATM!!
-    let oldBalanceAmount = q[0].current; // Connect to DB
+    let oldBalanceAmount = q[0].balance; // Connect to DB
 
-    table("rekening")
-    where([`IBAN`, '=', authKey]);
+    table("billing_account")
+    where([`iban`, '=', authKey]);
     update({
         'current': oldBalanceAmount - withdrawAmount
     });
@@ -127,6 +133,7 @@ router.get('*', function(req, res){
  * Actually run the API server
  */
 app.use('/', router);
+
 app.listen(PORT, () => {
     console.log(`[info]\t\tServer is running on port: ${PORT}`);
     console.log(`[info]\t\thttp://localhost:${PORT}`)
